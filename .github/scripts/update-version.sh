@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Automated version update script for hide-dotpaths plugin
-# Usage: ./.github/scripts/update-version.sh <new_version>
+# Usage: ./scripts/update-version.sh <new_version>
 
 set -e
 
@@ -63,10 +63,10 @@ for file in "${!FILES_PATTERNS[@]}"; do
 done
 
 # Update release script example
-if [[ -f ".github/scripts/release.sh" ]]; then
+if [[ -f "scripts/release.sh" ]]; then
   echo "📝 Updating release script example..."
-  sed -i "s/echo \"Example: \$0 [0-9]\+\.[0-9]\+\.[0-9]\+\"/echo \"Example: \$0 $NEW_VERSION\"/" ".github/scripts/release.sh"
-  echo "✅ Updated .github/scripts/release.sh"
+  sed -i "s/echo \"Example: \$0 [0-9]\+\.[0-9]\+\.[0-9]\+\"/echo \"Example: \$0 $NEW_VERSION\"/" "scripts/release.sh"
+  echo "✅ Updated scripts/release.sh"
 fi
 
 echo "🎉 Version update completed!"
@@ -76,10 +76,10 @@ for file in "${!FILES_PATTERNS[@]}"; do
     echo "  - $file"
   fi
 done
-echo "  - .github/scripts/release.sh"
+echo "  - scripts/release.sh"
 
 echo ""
 echo "💡 Next steps:"
 echo "  1. Review changes: git diff"
 echo "  2. Commit changes: git add . && git commit -m \"chore: bump version to $NEW_VERSION\""
-echo "  3. Create release: ./.github/scripts/release.sh $NEW_VERSION" 
+echo "  3. Create release: ./scripts/release.sh $NEW_VERSION" 

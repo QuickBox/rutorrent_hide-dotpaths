@@ -130,7 +130,6 @@ jobs:
             LICENSE \
             plugin.info \
             README.md \
-            scripts/ \
             version.txt
           
           echo "Archive created: $ARCHIVE_NAME"

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Manual release script for hide-dotpaths plugin
-# Usage: ./.github/scripts/release.sh <version>
+# Usage: ./scripts/release.sh <version>
 
 set -e
 
@@ -9,7 +9,7 @@ VERSION="$1"
 
 if [[ -z "$VERSION" ]]; then
   echo "Usage: $0 <version>"
-  echo "Example: $0 2.5.001"
+  echo "Example: $0 2.5.0"
   exit 1
 fi
 
