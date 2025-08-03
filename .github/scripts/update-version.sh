@@ -29,6 +29,7 @@ declare -A FILES_PATTERNS=(
   ["debug-utils.js"]="@version [0-9]+\.[0-9]+\.[0-9]+"
   ["debug-cache.js"]="@version [0-9]+\.[0-9]+\.[0-9]+"
   ["conf.php"]="@version [0-9]+\.[0-9]+\.[0-9]+"
+  ["README.md"]="\*\*Version:\*\* [0-9]+\.[0-9]+\.[0-9]+"
 )
 
 # Update each file
@@ -53,6 +54,9 @@ for file in "${!FILES_PATTERNS[@]}"; do
         ;;
       "debug-utils.js"|"debug-cache.js"|"conf.php")
         sed -i "s/@version [0-9]\+\.[0-9]\+\.[0-9]\+/@version $NEW_VERSION/" "$file"
+        ;;
+      "README.md")
+        sed -i "s/\*\*Version:\*\* [0-9]\+\.[0-9]\+\.[0-9]\+/**Version:** $NEW_VERSION/" "$file"
         ;;
     esac
     

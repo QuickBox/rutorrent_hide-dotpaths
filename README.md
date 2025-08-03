@@ -437,7 +437,7 @@ This project is licensed under the GNU General Public License v3.0.
 - **🐛 Issues**: Report bugs on [GitHub Issues](https://github.com/QuickBox/rutorrent_hide-dotpaths/issues)
 - **📖 Documentation**: This README and inline code comments
 
-**Version:** 2.5.001
+**Version:** 2.5.200
 
 ---
 
