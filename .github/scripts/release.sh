@@ -9,7 +9,7 @@ VERSION="$1"
 
 if [[ -z "$VERSION" ]]; then
   echo "Usage: $0 <version>"
-  echo "Example: $0 2.6.0"
+  echo "Example: $0 2.5.001"
   exit 1
 fi
 
