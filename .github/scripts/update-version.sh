@@ -9,13 +9,13 @@ NEW_VERSION="$1"
 
 if [[ -z "$NEW_VERSION" ]]; then
   echo "Usage: $0 <new_version>"
-  echo "Example: $0 2.6.0"
+  echo "Example: $0 2.5.0"
   exit 1
 fi
 
 # Validate version format
 if [[ ! "$NEW_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "❌ Invalid version format. Use semantic versioning (e.g., 2.6.0)"
+  echo "❌ Invalid version format. Use semantic versioning (e.g., 2.5.0)"
   exit 1
 fi
 
@@ -82,4 +82,11 @@ echo ""
 echo "💡 Next steps:"
 echo "  1. Review changes: git diff"
 echo "  2. Commit changes: git add . && git commit -m \"chore: bump version to $NEW_VERSION\""
-echo "  3. Create release: ./scripts/release.sh $NEW_VERSION" 
+echo "  3. Create release: ./scripts/release.sh $NEW_VERSION"
+
+# Automatically commit and push the changes
+echo "🔄 Committing version changes..."
+git add .
+git commit -m "chore: bump version to $NEW_VERSION"
+git push origin main
+echo "✅ Version changes committed and pushed automatically" 

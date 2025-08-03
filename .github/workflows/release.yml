@@ -42,44 +42,21 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_ENV
           echo "Version: $VERSION"
 
-      - name: Update version in all files
-        run: |
-          VERSION="${{ env.version }}"
-          echo "Updating version to $VERSION in all files..."
-          
-          # Run the update-version script
-          .github/scripts/update-version.sh "$VERSION"
-          
-          echo "✅ Version updated in all files"
-
-      - name: Commit version changes
+      - name: Update version in all files and commit
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           VERSION="${{ env.version }}"
+          echo "Updating version to $VERSION in all files..."
           
           # Configure git
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
-          # Add all changed files
-          git add .
+          # Run the update-version script (which will commit and push)
+          .github/scripts/update-version.sh "$VERSION"
           
-          # Commit the version changes
-          git commit -m "chore(release): bump version to v${VERSION}
-
-          - Updated version.txt to ${VERSION}
-          - Updated init.js @version comment to ${VERSION}
-          - Updated plugin.info version to ${VERSION}
-          - Updated conf.php @version comment to ${VERSION}
-          - Updated debug-utils.js @version comment to ${VERSION}
-          - Updated debug-cache.js @version comment to ${VERSION}
-          - Updated README.md version to ${VERSION}"
-          
-          # Push the changes with token
-          git push origin main
-          
-          echo "✅ Version changes committed and pushed"
+          echo "✅ Version updated, committed, and pushed automatically"
 
       - name: Get previous tag
         id: get_previous_tag
