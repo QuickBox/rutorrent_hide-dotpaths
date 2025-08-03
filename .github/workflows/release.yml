@@ -116,23 +116,32 @@ jobs:
           
           echo "Creating release archive: $ARCHIVE_NAME"
           
-          # Create temporary directory for clean archive
-          TEMP_DIR=$(mktemp -d)
-          echo "Using temporary directory: $TEMP_DIR"
-          
-          # Copy files to temp directory (excluding unwanted files)
-          rsync -av --exclude='.git' --exclude='.github' --exclude='node_modules' \
-            --exclude='*.log' --exclude='.DS_Store' --exclude='Thumbs.db' \
-            --exclude='*.tar.gz' --exclude='CHANGELOG.md' \
-            ./ "$TEMP_DIR/"
-          
-          # Create archive from temp directory
-          cd "$TEMP_DIR"
-          tar -czf "../$ARCHIVE_NAME" .
-          cd - > /dev/null
-          
-          # Clean up temp directory
-          rm -rf "$TEMP_DIR"
+          # Create archive directly with exclusions
+          tar -czf "$ARCHIVE_NAME" \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='*.log' \
+            --exclude='.DS_Store' \
+            --exclude='Thumbs.db' \
+            --exclude='*.tar.gz' \
+            --exclude='CHANGELOG.md' \
+            --exclude='coverage' \
+            --exclude='__tests__' \
+            --exclude='.cursor' \
+            --exclude='.vscode' \
+            --exclude='.trunk' \
+            --exclude='.windsurf' \
+            --exclude='.eslintrc.json' \
+            --exclude='.prettierrc*' \
+            --exclude='.editorconfig' \
+            --exclude='jest.config.js' \
+            --exclude='package*.json' \
+            --exclude='node_modules' \
+            --exclude='logs' \
+            --exclude='coverage' \
+            --exclude='.backup' \
+            .
           
           echo "Archive created: $ARCHIVE_NAME"
           ls -la "$ARCHIVE_NAME"
