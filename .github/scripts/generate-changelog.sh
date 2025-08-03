@@ -89,7 +89,7 @@ if git log --oneline "$git_range" 2>/dev/null | head -1; then
   get_commits_for_type "new" "New Additions" "🆕" || true
   get_commits_for_type "enh" "Enhancements" "✨" || true
   get_commits_for_type "enhancement" "Enhancements" "✨" || true
-  get_commits_for_type "fix" "Bug Fixes" "🐛" || true
+  get_commits_for_type "fix" "Fixes" "🔧" || true
   get_commits_for_type "hotfix" "Critical Fixes" "♨️" || true
   get_commits_for_type "refactor" "Refactoring" "🔧" || true
   get_commits_for_type "docs" "Documentation" "📚" || true
