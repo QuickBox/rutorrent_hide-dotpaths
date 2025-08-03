@@ -1,0 +1,114 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup environment
+        run: |
+          echo "Setting up release environment..."
+          chmod +x .github/scripts/generate-changelog.sh
+
+      - name: Get version from tag
+        id: get_version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Get previous tag
+        id: get_previous_tag
+        run: |
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "initial")
+          echo "previous_tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+          echo "Previous tag: $PREVIOUS_TAG"
+
+      - name: Generate changelog
+        id: generate_changelog
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          PREVIOUS_TAG="${{ steps.get_previous_tag.outputs.previous_tag }}"
+          OUTPUT_FILE="CHANGELOG.md"
+          
+          echo "Generating changelog for version $VERSION from $PREVIOUS_TAG"
+          .github/scripts/generate-changelog.sh "$VERSION" "$PREVIOUS_TAG" "$OUTPUT_FILE"
+          
+          if [ -f "$OUTPUT_FILE" ]; then
+            echo "✅ Changelog generated successfully"
+            cat "$OUTPUT_FILE"
+          else
+            echo "❌ Failed to generate changelog"
+            exit 1
+          fi
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: hide-dotpaths Plugin ${{ steps.get_version.outputs.version }}
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./CHANGELOG.md
+          asset_name: CHANGELOG.md
+          asset_content_type: text/markdown
+
+      - name: Create Release Archive
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          ARCHIVE_NAME="hide-dotpaths-plugin-v${VERSION}.tar.gz"
+          
+          echo "Creating release archive: $ARCHIVE_NAME"
+          tar -czf "$ARCHIVE_NAME" \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='*.log' \
+            --exclude='.DS_Store' \
+            --exclude='Thumbs.db' \
+            .
+          
+          echo "Archive created: $ARCHIVE_NAME"
+          ls -la "$ARCHIVE_NAME"
+
+      - name: Upload Release Archive
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./hide-dotpaths-plugin-v${{ steps.get_version.outputs.version }}.tar.gz
+          asset_name: hide-dotpaths-plugin-v${{ steps.get_version.outputs.version }}.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Cleanup
+        run: |
+          echo "Cleaning up temporary files..."
+          rm -f CHANGELOG.md hide-dotpaths-plugin-v*.tar.gz
+
+      - name: Release Summary
+        run: |
+          echo "🎉 Release completed successfully!"
+          echo "Version: ${{ steps.get_version.outputs.version }}"
+          echo "Previous: ${{ steps.get_previous_tag.outputs.previous_tag }}"
+          echo "Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref }}" 
