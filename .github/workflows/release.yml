@@ -53,6 +53,8 @@ jobs:
           echo "✅ Version updated in all files"
 
       - name: Commit version changes
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           VERSION="${{ env.version }}"
           
@@ -74,7 +76,7 @@ jobs:
           - Updated debug-cache.js @version comment to ${VERSION}
           - Updated README.md version to ${VERSION}"
           
-          # Push the changes
+          # Push the changes with token
           git push origin main
           
           echo "✅ Version changes committed and pushed"
