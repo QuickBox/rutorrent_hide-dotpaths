@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @author JMSolo [QuickBox.io]
- * @version 2.5
+ * @version 2.5.0
  */
 
 // Main enable/disable switch

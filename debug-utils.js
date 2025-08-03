@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  * 
  * @author JMSolo
- * @version 2.5
+ * @version 2.5.0
  */
 
 // Advanced debug cache with intelligent deduplication

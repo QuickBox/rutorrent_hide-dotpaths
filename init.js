@@ -18,7 +18,7 @@
  * Hides dot-prefixed files and directories from all ruTorrent path dropdowns
  *
  * @author JMSolo
- * @version 2.5
+ * @version 2.5.0
  */
 
 // Plugin initialization
@@ -28,7 +28,7 @@ plugin = new rPlugin("hide-dotpaths");
 plugin.author = "JMSolo";
 plugin.descr =
     "Hide dot-prefixed files and directories from all ruTorrent path dropdowns";
-plugin.version = "2.5";
+plugin.version = "2.5.0";
 
 // Simple configuration
 let config = {
