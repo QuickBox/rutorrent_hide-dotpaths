@@ -76,7 +76,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
+          tag_name: v${{ steps.get_version.outputs.version }}
           release_name: hide-dotpaths Plugin ${{ steps.get_version.outputs.version }}
           body_path: CHANGELOG.md
           draft: false
@@ -130,4 +130,4 @@ jobs:
           echo "🎉 Release completed successfully!"
           echo "Version: ${{ steps.get_version.outputs.version }}"
           echo "Previous: ${{ steps.get_previous_tag.outputs.previous_tag }}"
-          echo "Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref }}" 
+          echo "Release URL: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.get_version.outputs.version }}" 
