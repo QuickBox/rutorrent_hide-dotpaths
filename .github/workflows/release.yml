@@ -52,6 +52,33 @@ jobs:
           
           echo "✅ Version updated in all files"
 
+      - name: Commit version changes
+        run: |
+          VERSION="${{ env.version }}"
+          
+          # Configure git
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # Add all changed files
+          git add .
+          
+          # Commit the version changes
+          git commit -m "chore(release): bump version to v${VERSION}
+
+          - Updated version.txt to ${VERSION}
+          - Updated init.js @version comment to ${VERSION}
+          - Updated plugin.info version to ${VERSION}
+          - Updated conf.php @version comment to ${VERSION}
+          - Updated debug-utils.js @version comment to ${VERSION}
+          - Updated debug-cache.js @version comment to ${VERSION}
+          - Updated README.md version to ${VERSION}"
+          
+          # Push the changes
+          git push origin main
+          
+          echo "✅ Version changes committed and pushed"
+
       - name: Get previous tag
         id: get_previous_tag
         run: |
