@@ -50,8 +50,8 @@ jobs:
           echo "Updating version to $VERSION in all files..."
           
           # Configure git
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git config --global user.name 'QBXWatcher'
+          git config --global user.email 'qbxwatcher@quickbox.io'
           
           # Run the update-version script (which will commit and push)
           .github/scripts/update-version.sh "$VERSION"
