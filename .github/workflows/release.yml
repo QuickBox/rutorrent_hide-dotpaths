@@ -42,6 +42,16 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_ENV
           echo "Version: $VERSION"
 
+      - name: Update version in all files
+        run: |
+          VERSION="${{ env.version }}"
+          echo "Updating version to $VERSION in all files..."
+          
+          # Run the update-version script
+          .github/scripts/update-version.sh "$VERSION"
+          
+          echo "✅ Version updated in all files"
+
       - name: Get previous tag
         id: get_previous_tag
         run: |
