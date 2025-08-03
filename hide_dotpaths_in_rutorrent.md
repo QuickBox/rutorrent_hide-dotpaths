@@ -37,20 +37,6 @@ for user in "${users_all[@]:-}"; do
 done
 ```
 
-### 🔧 **Standard Installation**
-
-```bash
-# Clone and copy to plugins directory
-git clone https://github.com/QuickBox/rutorrent_hide-dotpaths.git
-cp -r rutorrent_hide-dotpaths /path/to/rutorrent/plugins/hide-dotpaths
-
-# Set permissions
-chmod 755 /path/to/rutorrent/plugins/hide-dotpaths/
-chmod 644 /path/to/rutorrent/plugins/hide-dotpaths/*.js
-chmod 644 /path/to/rutorrent/plugins/hide-dotpaths/*.php
-chmod 644 /path/to/rutorrent/plugins/hide-dotpaths/*.info
-```
-
 ### ⚙️ **Configuration**
 
 Edit `conf.php` to customize behavior:
@@ -81,8 +67,7 @@ $apply_filemanager_patch = true; // Apply server-side filemanager patch
 
 ## 🔧 **ALTERNATIVE: Filemanager Patch (Filemanager Only)**
 
-> [!NOTE]
-> **Limited Scope**: This patch **only affects the filemanager plugin**. For comprehensive protection, use the plugin above.
+**⚠️ Limited Scope**: This patch **only affects the filemanager plugin**. For comprehensive protection, use the plugin above.
 
 This method **disables** the "Show Hidden Files" checkbox in ruTorrent's File Manager so hidden files are **never shown**, even if users try to toggle it.
 
