@@ -78,6 +78,39 @@ get_commits_for_type() {
 
 # Check if we have any commits since the previous tag
 git_range="${GIT_RANGE:-${PREVIOUS_TAG}..HEAD}"
+
+# Ensure we have all tags available
+echo "Fetching all tags to ensure proper changelog generation..."
+git fetch --tags --force
+
+# Validate the git range
+if [[ "$PREVIOUS_TAG" != "initial" ]]; then
+  # Try to validate the tag exists
+  if ! git rev-parse "$PREVIOUS_TAG" >/dev/null 2>&1; then
+    echo "⚠️ Warning: Previous tag '$PREVIOUS_TAG' not found, trying alternative formats..."
+    
+    # Try with 'v' prefix if not present
+    if [[ ! "$PREVIOUS_TAG" =~ ^v ]] && git rev-parse "v$PREVIOUS_TAG" >/dev/null 2>&1; then
+      PREVIOUS_TAG="v$PREVIOUS_TAG"
+      git_range="${PREVIOUS_TAG}..HEAD"
+      echo "✅ Found tag with 'v' prefix: $PREVIOUS_TAG"
+    # Try without 'v' prefix if present
+    elif [[ "$PREVIOUS_TAG" =~ ^v ]] && git rev-parse "${PREVIOUS_TAG#v}" >/dev/null 2>&1; then
+      PREVIOUS_TAG="${PREVIOUS_TAG#v}"
+      git_range="${PREVIOUS_TAG}..HEAD"
+      echo "✅ Found tag without 'v' prefix: $PREVIOUS_TAG"
+    else
+      echo "❌ Could not find tag '$PREVIOUS_TAG' in any format, using 'initial'"
+      PREVIOUS_TAG="initial"
+      git_range="HEAD"
+    fi
+  else
+    echo "✅ Previous tag '$PREVIOUS_TAG' found and valid"
+  fi
+fi
+
+echo "Using git range: $git_range"
+
 if git log --oneline "$git_range" 2>/dev/null | head -1; then
   echo "✅ Found commits since ${PREVIOUS_TAG}, generating detailed changelog..."
 

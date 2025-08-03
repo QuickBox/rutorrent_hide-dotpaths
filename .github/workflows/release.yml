@@ -25,6 +25,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          fetch-tags: true
 
       - name: Setup environment
         run: |
@@ -67,10 +68,30 @@ jobs:
             PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "initial")
           fi
           
-          # Check if the previous tag actually exists
-          if [[ "$PREVIOUS_TAG" != "initial" ]] && ! git rev-parse "$PREVIOUS_TAG" >/dev/null 2>&1; then
-            echo "⚠️ Previous tag '$PREVIOUS_TAG' does not exist, using 'initial'"
-            PREVIOUS_TAG="initial"
+          # Fetch all tags to ensure we have access to remote tags
+          echo "Fetching all tags from remote..."
+          git fetch --tags --force
+          
+          # Normalize tag format - add 'v' prefix if missing
+          if [[ "$PREVIOUS_TAG" != "initial" && ! "$PREVIOUS_TAG" =~ ^v ]]; then
+            PREVIOUS_TAG="v$PREVIOUS_TAG"
+            echo "Normalized tag to: $PREVIOUS_TAG"
+          fi
+          
+          # Check if the previous tag actually exists (try both with and without 'v' prefix)
+          if [[ "$PREVIOUS_TAG" != "initial" ]]; then
+            if git rev-parse "$PREVIOUS_TAG" >/dev/null 2>&1; then
+              echo "✅ Found tag: $PREVIOUS_TAG"
+            elif [[ "$PREVIOUS_TAG" =~ ^v ]] && git rev-parse "${PREVIOUS_TAG#v}" >/dev/null 2>&1; then
+              PREVIOUS_TAG="${PREVIOUS_TAG#v}"
+              echo "✅ Found tag without 'v' prefix: $PREVIOUS_TAG"
+            elif [[ ! "$PREVIOUS_TAG" =~ ^v ]] && git rev-parse "v$PREVIOUS_TAG" >/dev/null 2>&1; then
+              PREVIOUS_TAG="v$PREVIOUS_TAG"
+              echo "✅ Found tag with 'v' prefix: $PREVIOUS_TAG"
+            else
+              echo "⚠️ Previous tag '$PREVIOUS_TAG' does not exist, using 'initial'"
+              PREVIOUS_TAG="initial"
+            fi
           fi
           
           # If previous_tag is "initial", use HEAD for git log
