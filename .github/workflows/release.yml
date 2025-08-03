@@ -116,32 +116,22 @@ jobs:
           
           echo "Creating release archive: $ARCHIVE_NAME"
           
-          # Create archive directly with exclusions
+          # Create archive with only the files that actually exist in this project
           tar -czf "$ARCHIVE_NAME" \
             --exclude='.git' \
             --exclude='.github' \
-            --exclude='node_modules' \
-            --exclude='*.log' \
-            --exclude='.DS_Store' \
-            --exclude='Thumbs.db' \
             --exclude='*.tar.gz' \
             --exclude='CHANGELOG.md' \
-            --exclude='coverage' \
-            --exclude='__tests__' \
-            --exclude='.cursor' \
-            --exclude='.vscode' \
-            --exclude='.trunk' \
-            --exclude='.windsurf' \
-            --exclude='.eslintrc.json' \
-            --exclude='.prettierrc*' \
-            --exclude='.editorconfig' \
-            --exclude='jest.config.js' \
-            --exclude='package*.json' \
-            --exclude='node_modules' \
-            --exclude='logs' \
-            --exclude='coverage' \
-            --exclude='.backup' \
-            .
+            conf.php \
+            debug-cache.js \
+            debug-utils.js \
+            init.js \
+            lang/ \
+            LICENSE \
+            plugin.info \
+            README.md \
+            scripts/ \
+            version.txt
           
           echo "Archive created: $ARCHIVE_NAME"
           ls -la "$ARCHIVE_NAME"
