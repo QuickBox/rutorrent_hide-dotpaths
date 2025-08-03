@@ -88,6 +88,8 @@ jobs:
 
       - name: Create Release
         id: create_release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           # Create the release using GitHub CLI
           gh release create "v${{ env.version }}" \
@@ -120,6 +122,8 @@ jobs:
           ls -la "$ARCHIVE_NAME"
 
       - name: Upload Release Archive
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           # Upload the archive using GitHub CLI
           gh release upload "v${{ env.version }}" \
