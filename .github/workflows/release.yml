@@ -4,6 +4,17 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 2.5.001)'
+        required: true
+        type: string
+      previous_tag:
+        description: 'Previous tag for changelog (e.g., initial)'
+        required: true
+        type: string
+        default: 'initial'
 
 jobs:
   release:
@@ -20,17 +31,25 @@ jobs:
           echo "Setting up release environment..."
           chmod +x .github/scripts/generate-changelog.sh
 
-      - name: Get version from tag
+      - name: Get version from tag or input
         id: get_version
         run: |
-          VERSION=${GITHUB_REF#refs/tags/}
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/}
+          fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
 
       - name: Get previous tag
         id: get_previous_tag
         run: |
-          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "initial")
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            PREVIOUS_TAG="${{ github.event.inputs.previous_tag }}"
+          else
+            PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "initial")
+          fi
           echo "previous_tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
           echo "Previous tag: $PREVIOUS_TAG"
 
