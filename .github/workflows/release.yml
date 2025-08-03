@@ -51,7 +51,13 @@ jobs:
             PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "initial")
           fi
           
-          # If previous_tag is "initial", use empty string for git log
+          # Check if the previous tag actually exists
+          if [[ "$PREVIOUS_TAG" != "initial" ]] && ! git rev-parse "$PREVIOUS_TAG" >/dev/null 2>&1; then
+            echo "⚠️ Previous tag '$PREVIOUS_TAG' does not exist, using 'initial'"
+            PREVIOUS_TAG="initial"
+          fi
+          
+          # If previous_tag is "initial", use HEAD for git log
           if [[ "$PREVIOUS_TAG" == "initial" ]]; then
             GIT_RANGE="HEAD"
           else
@@ -105,7 +111,7 @@ jobs:
 
       - name: Create Release Archive
         run: |
-          VERSION="${{ steps.get_version.outputs.version }}"
+          VERSION="${{ env.version }}"
           ARCHIVE_NAME="hide-dotpaths-plugin-v${VERSION}.tar.gz"
           
           echo "Creating release archive: $ARCHIVE_NAME"
