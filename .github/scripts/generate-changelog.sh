@@ -51,9 +51,12 @@ get_commits_for_type() {
   local section_name="$2"
   local emoji="$3"
 
+  # Use GIT_RANGE if available, otherwise fall back to PREVIOUS_TAG..HEAD
+  local git_range="${GIT_RANGE:-${PREVIOUS_TAG}..HEAD}"
+  
   # Get commits for both formats: "type(scope):" and "type:"
   local commits
-  commits=$(git log --oneline "${PREVIOUS_TAG}..HEAD" --grep="^${type}(" --grep="^${type}:" 2>/dev/null | head -10)
+  commits=$(git log --oneline "$git_range" --grep="^${type}(" --grep="^${type}:" 2>/dev/null | head -10)
 
   if [[ -n "$commits" ]]; then
     echo "📝 Found commits for ${type}, adding ${section_name} section"
@@ -74,7 +77,8 @@ get_commits_for_type() {
 }
 
 # Check if we have any commits since the previous tag
-if git log --oneline "${PREVIOUS_TAG}..HEAD" 2>/dev/null | head -1; then
+git_range="${GIT_RANGE:-${PREVIOUS_TAG}..HEAD}"
+if git log --oneline "$git_range" 2>/dev/null | head -1; then
   echo "✅ Found commits since ${PREVIOUS_TAG}, generating detailed changelog..."
 
   # Generate sections for different commit types (only if commits exist)

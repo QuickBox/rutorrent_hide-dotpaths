@@ -39,7 +39,7 @@ jobs:
           else
             VERSION=${GITHUB_REF#refs/tags/}
           fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_ENV
           echo "Version: $VERSION"
 
       - name: Get previous tag
@@ -50,17 +50,32 @@ jobs:
           else
             PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "initial")
           fi
-          echo "previous_tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+          
+          # If previous_tag is "initial", use empty string for git log
+          if [[ "$PREVIOUS_TAG" == "initial" ]]; then
+            GIT_RANGE="HEAD"
+          else
+            GIT_RANGE="${PREVIOUS_TAG}..HEAD"
+          fi
+          
+          echo "previous_tag=$PREVIOUS_TAG" >> $GITHUB_ENV
+          echo "git_range=$GIT_RANGE" >> $GITHUB_ENV
           echo "Previous tag: $PREVIOUS_TAG"
+          echo "Git range: $GIT_RANGE"
 
       - name: Generate changelog
         id: generate_changelog
         run: |
-          VERSION="${{ steps.get_version.outputs.version }}"
-          PREVIOUS_TAG="${{ steps.get_previous_tag.outputs.previous_tag }}"
+          VERSION="${{ env.version }}"
+          PREVIOUS_TAG="${{ env.previous_tag }}"
+          GIT_RANGE="${{ env.git_range }}"
           OUTPUT_FILE="CHANGELOG.md"
           
           echo "Generating changelog for version $VERSION from $PREVIOUS_TAG"
+          echo "Git range: $GIT_RANGE"
+          
+          # Pass git range to changelog script
+          export GIT_RANGE="$GIT_RANGE"
           .github/scripts/generate-changelog.sh "$VERSION" "$PREVIOUS_TAG" "$OUTPUT_FILE"
           
           if [ -f "$OUTPUT_FILE" ]; then
@@ -76,8 +91,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.get_version.outputs.version }}
-          release_name: hide-dotpaths Plugin ${{ steps.get_version.outputs.version }}
+          tag_name: v${{ env.version }}
+          release_name: hide-dotpaths Plugin ${{ env.version }}
           body_path: CHANGELOG.md
           draft: false
           prerelease: false
@@ -116,8 +131,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./hide-dotpaths-plugin-v${{ steps.get_version.outputs.version }}.tar.gz
-          asset_name: hide-dotpaths-plugin-v${{ steps.get_version.outputs.version }}.tar.gz
+          asset_path: ./hide-dotpaths-plugin-v${{ env.version }}.tar.gz
+          asset_name: hide-dotpaths-plugin-v${{ env.version }}.tar.gz
           asset_content_type: application/gzip
 
       - name: Cleanup
@@ -128,6 +143,6 @@ jobs:
       - name: Release Summary
         run: |
           echo "🎉 Release completed successfully!"
-          echo "Version: ${{ steps.get_version.outputs.version }}"
-          echo "Previous: ${{ steps.get_previous_tag.outputs.previous_tag }}"
-          echo "Release URL: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.get_version.outputs.version }}" 
+          echo "Version: ${{ env.version }}"
+          echo "Previous: ${{ env.previous_tag }}"
+          echo "Release URL: https://github.com/${{ github.repository }}/releases/tag/v${{ env.version }}" 
