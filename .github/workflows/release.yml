@@ -87,25 +87,19 @@ jobs:
           fi
 
       - name: Create Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ env.version }}
-          release_name: hide-dotpaths Plugin ${{ env.version }}
-          body_path: CHANGELOG.md
-          draft: false
-          prerelease: false
-
-      - name: Upload Release Assets
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./CHANGELOG.md
-          asset_name: CHANGELOG.md
-          asset_content_type: text/markdown
+        id: create_release
+        run: |
+          # Create the release using GitHub CLI
+          gh release create "v${{ env.version }}" \
+            --title "hide-dotpaths Plugin ${{ env.version }}" \
+            --notes-file CHANGELOG.md \
+            --draft=false \
+            --prerelease=false
+          
+          # Get the release URL
+          RELEASE_URL=$(gh release view "v${{ env.version }}" --json url --jq .url)
+          echo "release_url=$RELEASE_URL" >> $GITHUB_ENV
+          echo "Release created: $RELEASE_URL"
 
       - name: Create Release Archive
         run: |
@@ -126,14 +120,13 @@ jobs:
           ls -la "$ARCHIVE_NAME"
 
       - name: Upload Release Archive
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./hide-dotpaths-plugin-v${{ env.version }}.tar.gz
-          asset_name: hide-dotpaths-plugin-v${{ env.version }}.tar.gz
-          asset_content_type: application/gzip
+        run: |
+          # Upload the archive using GitHub CLI
+          gh release upload "v${{ env.version }}" \
+            "./hide-dotpaths-plugin-v${{ env.version }}.tar.gz" \
+            --clobber
+          
+          echo "✅ Archive uploaded successfully"
 
       - name: Cleanup
         run: |
@@ -145,4 +138,4 @@ jobs:
           echo "🎉 Release completed successfully!"
           echo "Version: ${{ env.version }}"
           echo "Previous: ${{ env.previous_tag }}"
-          echo "Release URL: https://github.com/${{ github.repository }}/releases/tag/v${{ env.version }}" 
+          echo "Release URL: ${{ env.release_url }}" 
